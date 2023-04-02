@@ -7,6 +7,6 @@ RUN npm install -g pnpm
 RUN pnpm install -P
 
 COPY ./src ./src
-COPY ./videos ./videos
+# COPY ./videos ./videos
 
 CMD pnpm start
