@@ -1,6 +1,6 @@
 # Bootstrapping Microservices
 
-Code and examples of my learning from the book [Bootstrapping Microservices](https://www.bootstrapping-microservices.com).
+Code implementation of my learning from the book [Bootstrapping Microservices](https://www.bootstrapping-microservices.com).
 
 ## Topics
 
@@ -8,5 +8,6 @@ Code and examples of my learning from the book [Bootstrapping Microservices](htt
 - Containerization with Docker
 - Cloud storage with Azure storage
 - Microservices Application with Docker Compose
+- MongoDB Application database
 
 [Click here to support the author's my work](https://www.codecapers.com.au/about#support-my-work)
