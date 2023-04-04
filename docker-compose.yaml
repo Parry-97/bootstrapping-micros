@@ -40,3 +40,26 @@ services:
       - VIDEO_STORAGE_PORT=80
 
     restart: "no"
+
+  #Define the history microservice with a Docker volume for the code in the src folder for a live reload during development
+  history:
+    image: history # image name
+    build: # build from Dockerfile
+      context: ./history # path to Dockerfile
+      dockerfile: dev.Dockerfile # Dockerfile name
+
+    container_name: history # container name
+
+    ports:
+      - "4003:80" # host:container
+
+    environment:
+      - PORT=80 # port to run the server on
+      - NODE_ENV=development
+    volumes:
+      # The syntax is the usual host:container
+      # NOTE: the z flag simply indicates Docker that the volume is to be shared (potentially among multiple containers).
+      - ./tmp/history/npm-cache:/root/.npm:z
+      - ./history/src:/usr/src/app/src:z
+
+    restart: "no"
