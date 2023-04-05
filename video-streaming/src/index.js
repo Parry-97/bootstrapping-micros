@@ -45,7 +45,7 @@ async function main() {
   //
   app.listen(PORT, () => {
     console.log(
-      `Microservice listening, please load the data file db-fixture/videos.json into your database before testing this microservice.`
+      `Hello from the video-streaming microservice listening on PORT ${PORT}`
     );
   });
 }

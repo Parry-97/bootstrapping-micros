@@ -5,6 +5,12 @@ const express = require("express");
 
 // ...
 
+if (!process.env.PORT) {
+  throw new Error("PORT environment variable is required");
+}
+
+console.log("Hello from history microservice after change!");
+
 const PORT = process.env.PORT;
 
 async function main() {

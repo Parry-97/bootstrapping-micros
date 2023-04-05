@@ -42,5 +42,5 @@ app.get("/video", async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Microservice online`);
+  console.log(`Hello from the storage microservice listening on PORT ${PORT}`);
 });

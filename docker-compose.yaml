@@ -12,8 +12,15 @@ services:
     image: azure-storage
     build:
       context: ./azure-storage/
-      dockerfile: Dockerfile
+      dockerfile: dev.Dockerfile
+
     container_name: video-storage
+
+    volumes:
+      # The syntax is the usual host:container
+      - ./tmp/azure-storage/npm-cache:/root/.npm:z
+      - ./azure-storage/src:/usr/src/app/src:z
+
     ports:
       - "4001:80"
     environment:
@@ -23,11 +30,16 @@ services:
 
   video-streaming:
     image: video-streaming # image name
-    build: # build from Dockerfile
-      context: ./video-streaming # path to Dockerfile
-      dockerfile: Dockerfile # Dockerfile name
+    build: # build from dev.Dockerfile
+      context: ./video-streaming # path to dev.Dockerfile
+      dockerfile: dev.Dockerfile # dev.Dockerfile name
 
     container_name: video-streaming # container name
+
+    volumes:
+      # The syntax is the usual host:container
+      - ./tmp/video-streaming/npm-cache:/root/.npm:z
+      - ./video-streaming/src:/usr/src/app/src:z
 
     ports:
       - "4002:80" # host:container
@@ -44,9 +56,9 @@ services:
   #Define the history microservice with a Docker volume for the code in the src folder for a live reload during development
   history:
     image: history # image name
-    build: # build from Dockerfile
-      context: ./history # path to Dockerfile
-      dockerfile: dev.Dockerfile # Dockerfile name
+    build: # build from dev.Dockerfile
+      context: ./history # path to dev.Dockerfile
+      dockerfile: dev.Dockerfile # dev.Dockerfile name
 
     container_name: history # container name
 
