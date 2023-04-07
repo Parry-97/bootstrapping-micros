@@ -68,6 +68,8 @@ services:
     environment:
       - PORT=80 # port to run the server on
       - NODE_ENV=development
+      - DBHOST=mongodb://db:27017
+      - DBNAME=history
     volumes:
       # The syntax is the usual host:container
       # NOTE: the z flag simply indicates Docker that the volume is to be shared (potentially among multiple containers).

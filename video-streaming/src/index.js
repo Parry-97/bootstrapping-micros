@@ -16,38 +16,63 @@ async function main() {
   const videosCollection = db.collection("videos");
 
   app.get("/video", async (req, res) => {
-    const videoId = new mongodb.ObjectId(req.query.id);
-    const videoRecord = await videosCollection.findOne({ _id: videoId });
-    if (!videoRecord) {
-      res.sendStatus(404);
-      return;
-    }
-
-    const forwardRequest = http.request(
-      {
-        host: VIDEO_STORAGE_HOST,
-        port: VIDEO_STORAGE_PORT,
-        path: `/video?path=${videoRecord.videoPath}`,
-        method: "GET",
-        headers: req.headers,
-      },
-      (forwardResponse) => {
-        res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
-        forwardResponse.pipe(res);
-      }
-    );
-
-    req.pipe(forwardRequest);
+    let videoPath = "sample.mp4";
+    sendViewedMessage(videoPath);
+    res.sendStatus(200);
+    //   const videoId = new mongodb.ObjectId(req.query.id);
+    //   const videoRecord = await videosCollection.findOne({ _id: videoId });
+    //   if (!videoRecord) {
+    //     res.sendStatus(404);
+    //     return;
+    //   }
+    //
+    //   const forwardRequest = http.request(
+    //     {
+    //       host: VIDEO_STORAGE_HOST,
+    //       port: VIDEO_STORAGE_PORT,
+    //       path: `/video?path=${videoRecord.videoPath}`,
+    //       method: "GET",
+    //       headers: req.headers,
+    //     },
+    //     (forwardResponse) => {
+    //       res.writeHeader(forwardResponse.statusCode, forwardResponse.headers);
+    //       forwardResponse.pipe(res);
+    //       sendViewedMessage(videoPath);
+    //     }
+    //   );
+    //
+    //   req.pipe(forwardRequest);
   });
-
   //
-  // Starts the HTTP server.
-  //
+  // //
+  // // Starts the HTTP server.
+  // //
   app.listen(PORT, () => {
     console.log(
       `Hello from the video-streaming microservice listening on PORT ${PORT}`
     );
   });
+}
+
+//function to send and http POST request to the history microservice for a viewed message
+function sendViewedMessage(videoPath) {
+  const postData = JSON.stringify({ videoPath });
+  const postOptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+  const req = http.request("http://history/viewed", postOptions);
+
+  req.on("close", () => {});
+
+  req.on("error", (err) => {
+    console.error(err.message);
+  });
+
+  req.write(postData);
+  req.end();
 }
 
 main().catch((err) => {
