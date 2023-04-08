@@ -8,4 +8,5 @@ RUN npm install -g pnpm
 
 CMD pnpm config set cache-min 9999999 && \
     pnpm install && \
+    pnpm wait-port rabbitmq:5672 && \
     pnpm dev

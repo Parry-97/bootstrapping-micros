@@ -1,6 +1,7 @@
 const express = require("express");
 const http = require("http");
 const mongodb = require("mongodb");
+const amqp = require("amqplib");
 
 const app = express();
 
@@ -9,15 +10,21 @@ const VIDEO_STORAGE_HOST = process.env.VIDEO_STORAGE_HOST;
 const VIDEO_STORAGE_PORT = parseInt(process.env.VIDEO_STORAGE_PORT);
 const DBHOST = process.env.DBHOST;
 const DBNAME = process.env.DBNAME;
+const RABBIT = process.env.RABBIT;
 
 async function main() {
   const client = await mongodb.MongoClient.connect(DBHOST);
   const db = client.db(DBNAME);
   const videosCollection = db.collection("videos");
 
+  const messagingConnection = await amqp.connect(RABBIT);
+  const messageChannel = await messagingConnection.createChannel();
+
+  await messageChannel.assertExchange("viewed", "fanout");
+
   app.get("/video", async (req, res) => {
     let videoPath = "sample.mp4";
-    sendViewedMessage(videoPath);
+    sendViewedMessage(messageChannel, videoPath);
     res.sendStatus(200);
     //   const videoId = new mongodb.ObjectId(req.query.id);
     //   const videoRecord = await videosCollection.findOne({ _id: videoId });
@@ -55,24 +62,15 @@ async function main() {
 }
 
 //function to send and http POST request to the history microservice for a viewed message
-function sendViewedMessage(videoPath) {
-  const postData = JSON.stringify({ videoPath });
-  const postOptions = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  };
-  const req = http.request("http://history/viewed", postOptions);
+function sendViewedMessage(messageChannel, videoPath) {
+  const msg = { videoPath: videoPath };
+  const jssonMsg = JSON.stringify(msg);
+  //NOTE: The code publishes the message to the "viewed" exchange with an empty routing key.
+  messageChannel.publish("viewed", "", Buffer.from(jssonMsg));
 
-  req.on("close", () => {});
-
-  req.on("error", (err) => {
-    console.error(err.message);
-  });
-
-  req.write(postData);
-  req.end();
+  ///NOTE: The code sends the message to the "viewed" queue of the default exchange.
+  // messageChannel.publish("", "viewed", Buffer.from(jssonMsg));
+  // messageChannel.sendToQueue("viewed", Buffer.from(jssonMsg));
 }
 
 main().catch((err) => {
