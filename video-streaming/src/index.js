@@ -66,6 +66,11 @@ function sendViewedMessage(messageChannel, videoPath) {
   const msg = { videoPath: videoPath };
   const jssonMsg = JSON.stringify(msg);
   //NOTE: The code publishes the message to the "viewed" exchange with an empty routing key.
+  //This means that the message will be published to all queues bound to the "viewed" exchange.
+  //when the publish method is called with an empty routing key and a fanout
+  //exchange type is used, the message will be sent to all queues bound to the
+  //exchange. This is because fanout exchanges distribute messages to all queues
+  //that are bound to them, regardless of the routing key.
   messageChannel.publish("viewed", "", Buffer.from(jssonMsg));
 
   ///NOTE: The code sends the message to the "viewed" queue of the default exchange.

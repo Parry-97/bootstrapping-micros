@@ -48,8 +48,9 @@ async function main() {
   await messageChannel.bindQueue(queue, "viewed", "");
   await messageChannel.consume(queue, consumeViewedMessage);
 
-  await messageChannel.assertQueue("viewed", {});
-  await messageChannel.consume("viewed", consumeViewedMessage);
+  //NOTE: PREVIOUS VERSION: The code then asserts the existence of the "viewed" queue and binds a consumer to it.
+  // await messageChannel.assertQueue("viewed", {});
+  // await messageChannel.consume("viewed", consumeViewedMessage);
 
   //Add a POST handler for the /viewed route to add the viewed video path to the mongo database videos collection
   app.post("/viewed", async (req, res) => {
