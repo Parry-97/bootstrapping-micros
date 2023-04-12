@@ -2,30 +2,42 @@ const express = require("express");
 const http = require("http");
 const mongodb = require("mongodb");
 const amqp = require("amqplib");
+const fs = require("fs");
 
 const app = express();
 
 const PORT = process.env.PORT;
-const VIDEO_STORAGE_HOST = process.env.VIDEO_STORAGE_HOST;
-const VIDEO_STORAGE_PORT = parseInt(process.env.VIDEO_STORAGE_PORT);
-const DBHOST = process.env.DBHOST;
-const DBNAME = process.env.DBNAME;
-const RABBIT = process.env.RABBIT;
+// const VIDEO_STORAGE_HOST = process.env.VIDEO_STORAGE_HOST;
+// const VIDEO_STORAGE_PORT = parseInt(process.env.VIDEO_STORAGE_PORT);
+// const DBHOST = process.env.DBHOST;
+// const DBNAME = process.env.DBNAME;
+// const RABBIT = process.env.RABBIT;
 
 async function main() {
-  const client = await mongodb.MongoClient.connect(DBHOST);
-  const db = client.db(DBNAME);
-  const videosCollection = db.collection("videos");
-
-  const messagingConnection = await amqp.connect(RABBIT);
-  const messageChannel = await messagingConnection.createChannel();
-
-  await messageChannel.assertExchange("viewed", "fanout");
+  // const client = await mongodb.MongoClient.connect(DBHOST);
+  // const db = client.db(DBNAME);
+  // const videosCollection = db.collection("videos");
+  //
+  // const messagingConnection = await amqp.connect(RABBIT);
+  // const messageChannel = await messagingConnection.createChannel();
+  //
+  // await messageChannel.assertExchange("viewed", "fanout");
 
   app.get("/video", async (req, res) => {
-    let videoPath = "sample.mp4";
-    sendViewedMessage(messageChannel, videoPath);
-    res.sendStatus(200);
+    //
+    // fs.createReadStream(videoPath).pipe(res);
+    // retrieve the sample video from the 'videos' folder in the project directory and send it to the response stream
+    const videoPath = "./videos/SampleVideo_1280x720_1mb.mp4";
+    const stats = await fs.promises.stat(videoPath);
+    const sampleVideo = fs.createReadStream(
+      "./videos/SampleVideo_1280x720_1mb.mp4"
+    );
+    res.writeHead(200, {
+      "Content-Length": stats.size,
+      "Content-Type": "video/mp4",
+    });
+    sampleVideo.pipe(res);
+    // sendViewedMessage(messageChannel, videoPath);
     //   const videoId = new mongodb.ObjectId(req.query.id);
     //   const videoRecord = await videosCollection.findOne({ _id: videoId });
     //   if (!videoRecord) {
@@ -50,10 +62,7 @@ async function main() {
     //
     //   req.pipe(forwardRequest);
   });
-  //
-  // //
-  // // Starts the HTTP server.
-  // //
+
   app.listen(PORT, () => {
     console.log(
       `Hello from the video-streaming microservice listening on PORT ${PORT}`
