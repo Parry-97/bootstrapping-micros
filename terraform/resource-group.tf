@@ -1,4 +1,4 @@
 resource "azurerm_resource_group" "flixtube" {
-  name     = "flixtube"
-  location = "westeurope"
+  name     = var.app_name
+  location = var.location
 }

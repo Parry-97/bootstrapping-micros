@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: video-streaming
-          image: bmsv1.azurecr.io/video-streaming:1
+          image: azpsftregistry.azurecr.io/video-streaming:1
           imagePullPolicy: IfNotPresent
           env:
             - name: PORT
